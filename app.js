@@ -24,14 +24,11 @@ mongoose.connect(process.env.MONGODB_URL)
 /* MIDDLEWARE FOR PARSING JSON DATA */
 app.use(express.json())
 
-/* MIDDLEWARE FOR COOKIE-PARSER */
-app.use(cookieParser())
-
-app.use('/uploads', express.static(__dirname + '/uploads'));
-
 /* MIDDLEWARE FOR PARSING FORM DATA */
 app.use(express.urlencoded({extended: false}))
 
+/* MIDDLEWARE FOR COOKIE-PARSER */
+app.use(cookieParser())
 
 /* CORS MIDDLEWARE */ 
 app.use(
@@ -42,6 +39,8 @@ app.use(
         origin: 'https://mern-front-1lvr.onrender.com'
     })
 )
+
+app.use('/uploads', express.static(__dirname + '/uploads'));
 
 /* MIDDLEWARE FOR ROUTES*/
 app.use('/', auth)
