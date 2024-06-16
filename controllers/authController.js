@@ -69,7 +69,7 @@ const logInController = async (req, res) => {
         //Confirm if the password are the same as the one in our database
         const passwordMatch = await comparePassword(password, user.password)
         if(passwordMatch){
-           jwt.sign({username: user.username, id: user._id, email: user.email}, process.env.JWT_SECRET, {}, (err, token) => {
+            jwt.sign({username: user.username, id: user._id, email: user.email}, process.env.JWT_SECRET, {}, (err, token) => {
             if(err) throw(err);
             res.cookie('token', token).json(user)
            })
