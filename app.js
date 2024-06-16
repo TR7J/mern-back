@@ -58,7 +58,7 @@ app.post('/post', uploadMiddleware.single('file'), async(req, res) => {
         const newPath = path + '.' + ext
         fs.renameSync(path, newPath)
 
-        const {token} = req.cookies;
+        const {token} = req.cookies.token;
         jwt.verify(token, process.env.JWT_SECRET, {}, async (err,info) => {
             if (err) throw err;
             const { title, summary, category, description } = req.body
@@ -92,7 +92,7 @@ app.put('/post', uploadMiddleware.single('file'), async(req, res) => {
             fs.renameSync(path, newPath);
         }
 
-        const {token} = req.cookies;
+        const {token} = req.cookies.token;
         jwt.verify(token, process.env.JWT_SECRET, {}, async (err,info) => {
             if (err) throw err;
             const {id,title,summary,category,description} = req.body;
@@ -123,7 +123,7 @@ app.put('/post', uploadMiddleware.single('file'), async(req, res) => {
 app.delete('/post/:id', async(req, res) => {
   try {
     const {id} = req.params
-    const {token} = req.cookies;
+    const {token} = req.cookies.token;
     jwt.verify(token, process.env.JWT_SECRET, {}, async (err,info) => {
         if (err) throw err;
         const post = await Post.findById(id);
