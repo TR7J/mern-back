@@ -36,7 +36,9 @@ app.use(
         credentials: true,
         /* origin: 'http://localhost:3000' */
         /* origin: 'https://course-finder-app-2.onrender.com' */
-        origin: 'https://mern-front-1lvr.onrender.com'
+        origin: 'https://mern-front-1lvr.onrender.com',
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],  
+        allowedHeaders: ['Content-Type', 'Authorization'], 
     })
 )
 
