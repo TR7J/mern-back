@@ -1,6 +1,15 @@
 /* IMPORTS */
 const express = require('express')
 const cors = require('cors')
+const corsOptions = {
+  credentials: true,
+  /* origin: 'http://localhost:3000' */
+  /* origin: 'https://course-finder-app-2.onrender.com' */
+  origin: 'https://mern-front-1lvr.onrender.com',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  
+  allowedHeaders: ['Content-Type', 'Authorization'], 
+}
+
 const dotenv = require('dotenv').config()
 const auth = require('./routes/auth')
 const mongoose = require('mongoose')
@@ -31,16 +40,9 @@ app.use(express.urlencoded({extended: false}))
 app.use(cookieParser())
 
 /* CORS MIDDLEWARE */ 
-app.use(
-    cors({
-        credentials: true,
-        /* origin: 'http://localhost:3000' */
-        /* origin: 'https://course-finder-app-2.onrender.com' */
-        origin: 'https://mern-front-1lvr.onrender.com',
-        methods: ['GET', 'POST', 'PUT', 'DELETE'],  
-        allowedHeaders: ['Content-Type', 'Authorization'], 
-    })
-)
+app.use(cors(corsOptions))
+
+app.options('/post', cors(corsOptions)); 
 
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
