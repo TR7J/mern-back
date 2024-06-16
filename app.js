@@ -30,6 +30,9 @@ mongoose.connect(process.env.MONGODB_URL)
 .then(() => console.log('Connected to database'))
 .catch((err) => console.log('Not Connected to database', err))
 
+/* CORS MIDDLEWARE */ 
+app.use(cors(corsOptions))
+
 /* MIDDLEWARE FOR PARSING JSON DATA */
 app.use(express.json())
 
@@ -39,12 +42,23 @@ app.use(express.urlencoded({extended: false}))
 /* MIDDLEWARE FOR COOKIE-PARSER */
 app.use(cookieParser())
 
-/* CORS MIDDLEWARE */ 
-app.use(cors(corsOptions))
-
 app.options('/post', cors(corsOptions)); 
 
 app.use('/uploads', express.static(__dirname + '/uploads'));
+
+// Middleware to extract JWT token from Authorization header
+const extractToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    req.token = authHeader.split(' ')[1];
+  } else {
+    req.token = null; 
+  }
+  next();
+};
+
+// Apply extractToken middleware globally or to specific routes
+app.use(extractToken);
 
 /* MIDDLEWARE FOR ROUTES*/
 app.use('/', auth)
@@ -62,6 +76,9 @@ app.post('/post', uploadMiddleware.single('file'), async(req, res) => {
         fs.renameSync(path, newPath)
 
         const {token} = req.cookies;
+        if (!token) {
+          return res.status(401).json({ message: 'Authentication token missing' });
+        }
         jwt.verify(token, process.env.JWT_SECRET, {}, async (err,info) => {
             if (err) throw err;
             const { title, summary, category, description } = req.body
@@ -96,6 +113,9 @@ app.put('/post', uploadMiddleware.single('file'), async(req, res) => {
         }
 
         const {token} = req.cookies;
+        if (!token) {
+          return res.status(401).json({ message: 'Authentication token missing' });
+        }
         jwt.verify(token, process.env.JWT_SECRET, {}, async (err,info) => {
             if (err) throw err;
             const {id,title,summary,category,description} = req.body;
@@ -127,6 +147,9 @@ app.delete('/post/:id', async(req, res) => {
   try {
     const {id} = req.params
     const {token} = req.cookies;
+    if (!token) {
+      return res.status(401).json({ message: 'Authentication token missing' });
+    }
     jwt.verify(token, process.env.JWT_SECRET, {}, async (err,info) => {
         if (err) throw err;
         const post = await Post.findById(id);
