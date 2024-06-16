@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 
 /* ADMIN FUNCTION */
 async function confirmAdmin (email) {
-    // Assume there's a list of creator emails
+    // A list of creator emails
     const adminEmails = ['timjediel99@gmail.com', 'jkibura@gmail.com']; 
     return adminEmails.includes(email);
 }

@@ -1,15 +1,6 @@
 /* IMPORTS */
 const express = require('express')
 const cors = require('cors')
-const corsOptions = {
-  credentials: true,
-  /* origin: 'http://localhost:3000' */
-  /* origin: 'https://course-finder-app-2.onrender.com' */
-  origin: 'https://mern-front-1lvr.onrender.com',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  
-  allowedHeaders: ['Content-Type', 'Authorization'], 
-}
-
 const dotenv = require('dotenv').config()
 const auth = require('./routes/auth')
 const mongoose = require('mongoose')
@@ -30,45 +21,28 @@ mongoose.connect(process.env.MONGODB_URL)
 .then(() => console.log('Connected to database'))
 .catch((err) => console.log('Not Connected to database', err))
 
-/* CORS MIDDLEWARE */ 
-app.use(cors(corsOptions))
-
 /* MIDDLEWARE FOR PARSING JSON DATA */
 app.use(express.json())
-
-/* MIDDLEWARE FOR PARSING FORM DATA */
-app.use(express.urlencoded({extended: false}))
 
 /* MIDDLEWARE FOR COOKIE-PARSER */
 app.use(cookieParser())
 
-app.options('/post', cors(corsOptions)); 
-
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
-// Middleware to extract JWT token from Authorization header
-const extractToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    req.token = authHeader.split(' ')[1];
-  } else {
-    req.token = null; 
-  }
-  next();
-};
+/* MIDDLEWARE FOR PARSING FORM DATA */
+app.use(express.urlencoded({extended: false}))
 
-// Apply extractToken middleware globally or to specific routes
-app.use(extractToken);
 
-console.log('Received token:', req.token);
-
+/* CORS MIDDLEWARE */ 
+app.use(
+    cors({
+        credentials: true,
+        origin: 'https://mern-front-1lvr.onrender.com'
+    })
+)
 
 /* MIDDLEWARE FOR ROUTES*/
 app.use('/', auth)
-
-app.get('/', (req, res) => {
-  res.send('Hello from the backend! ');
-});
 
 app.post('/post', uploadMiddleware.single('file'), async(req, res) => {
     try {
@@ -79,9 +53,6 @@ app.post('/post', uploadMiddleware.single('file'), async(req, res) => {
         fs.renameSync(path, newPath)
 
         const {token} = req.cookies;
-        if (!token) {
-          return res.status(401).json({ message: 'Authentication token missing' });
-        }
         jwt.verify(token, process.env.JWT_SECRET, {}, async (err,info) => {
             if (err) throw err;
             const { title, summary, category, description } = req.body
@@ -116,9 +87,6 @@ app.put('/post', uploadMiddleware.single('file'), async(req, res) => {
         }
 
         const {token} = req.cookies;
-        if (!token) {
-          return res.status(401).json({ message: 'Authentication token missing' });
-        }
         jwt.verify(token, process.env.JWT_SECRET, {}, async (err,info) => {
             if (err) throw err;
             const {id,title,summary,category,description} = req.body;
@@ -150,9 +118,6 @@ app.delete('/post/:id', async(req, res) => {
   try {
     const {id} = req.params
     const {token} = req.cookies;
-    if (!token) {
-      return res.status(401).json({ message: 'Authentication token missing' });
-    }
     jwt.verify(token, process.env.JWT_SECRET, {}, async (err,info) => {
         if (err) throw err;
         const post = await Post.findById(id);
@@ -280,12 +245,6 @@ app.post('/post/:testimonyId', async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     }
   });
-
-/* Error handler middleware */
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
-});
 
 /* CREATING A PORT */
 app.listen(4000, ()=>{
