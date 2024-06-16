@@ -46,6 +46,10 @@ app.use(
 /* MIDDLEWARE FOR ROUTES*/
 app.use('/', auth)
 
+app.get('/', (req, res) => {
+  res.send('Hello from the backend!');
+});
+
 app.post('/post', uploadMiddleware.single('file'), async(req, res) => {
     try {
         const { originalname, path } = req.file
