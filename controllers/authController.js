@@ -82,6 +82,11 @@ const logInController = async (req, res) => {
     }
 }
 
+/* Error handler middleware */
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: 'Something went wrong!' });
+});
 
 /* EXPORTING CONTROLLERS*/
 module.exports = {
