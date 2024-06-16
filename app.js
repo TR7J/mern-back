@@ -60,6 +60,9 @@ const extractToken = (req, res, next) => {
 // Apply extractToken middleware globally or to specific routes
 app.use(extractToken);
 
+console.log('Received token:', req.token);
+
+
 /* MIDDLEWARE FOR ROUTES*/
 app.use('/', auth)
 
