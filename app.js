@@ -253,6 +253,12 @@ app.post('/post/:testimonyId', async (req, res) => {
     }
   });
 
+/* Error handler middleware */
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+});
+
 /* CREATING A PORT */
 app.listen(4000, ()=>{
     console.log("Server is listening on port 4000")
